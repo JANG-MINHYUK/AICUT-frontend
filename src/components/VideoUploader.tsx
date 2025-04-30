@@ -1,40 +1,27 @@
-import React, { useRef } from 'react';
+import React from "react";
 
-type VideoUploaderProps = {
-  onFileSelect: (file: File) => void;
+type Props = {
+  onFileChange: (file: File) => void;
 };
 
-const VideoUploader: React.FC<VideoUploaderProps> = ({ onFileSelect }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith('video/')) {
-      if (file.size > 100 * 1024 * 1024) {
-        alert('100MB 이하의 영상만 업로드 가능합니다.');
-        return;
-      }
-      onFileSelect(file);
-    } else {
-      alert('영상 파일을 선택해주세요.');
+const VideoUploader: React.FC<Props> = ({ onFileChange }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      onFileChange(e.target.files[0]);
     }
   };
 
   return (
-    <div className="flex flex-col items-center p-4 border border-gray-300 rounded-lg">
+    <div className="p-4 border rounded-xl shadow bg-white">
+      <label className="block mb-2 text-sm font-medium text-gray-700">
+        비디오 파일 업로드
+      </label>
       <input
         type="file"
         accept="video/*"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        className="hidden"
+        onChange={handleChange}
+        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
       />
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        영상 업로드하기
-      </button>
     </div>
   );
 };

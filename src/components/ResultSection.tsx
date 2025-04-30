@@ -10,7 +10,7 @@ type ResultSectionProps = {
   };
 };
 
-const ResultSection: React.FC<ResultSectionProps> = ({ videoUrls }) => {
+const ResultSection: React.FC<ResultSectionProps> = ({ videoUrls = {} }) => {
   const renderSection = (title: string, url?: string) => {
     if (!url) return null;
 
