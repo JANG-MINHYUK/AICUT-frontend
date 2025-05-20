@@ -38,51 +38,36 @@ const Home: React.FC = () => {
     console.log("📡 Uploading to:", import.meta.env.VITE_API_URL);
 
     try {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${import.meta.env.VITE_API_URL}/process`, true);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/process`, {
+        method: 'POST',
+        body: formData,
+        mode: 'cors',
+      });
 
-      // ✅ 업로드 진행률 표시
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percent = Math.round((event.loaded / event.total) * 100);
-          console.log(`📈 Upload Progress: ${percent}%`);
-          setUploadProgress(percent);
+      if (response.ok) {
+        const data = await response.json();
+
+        if (processingMode === 'split' && data.segments.length === 0) {
+          alert("No segments found");
+          setIsProcessing(false);
+          return;
         }
-      };
 
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
-
-          if (processingMode === 'split' && data.segments.length === 0) {
-            alert("No segments found");
-            setIsProcessing(false);
-            return;
-          }
-
-          setResults({
-            original: data.original_url,
-            processed: data.processed_url,
-            bgRemoved: data.bg_removed_url,
-            subtitled: data.subtitled_url,
-            subtitleFile: data.subtitle_file_url,
-            zipUrl: data.zip_url,
-          });
-        } else {
-          alert(`서버 오류: ${xhr.status}`);
-        }
-        setIsProcessing(false);
-      };
-
-      xhr.onerror = () => {
-        alert('업로드 실패. 다시 시도해주세요.');
-        setIsProcessing(false);
-      };
-
-      xhr.send(formData);
+        setResults({
+          original: data.original_url,
+          processed: data.processed_url,
+          bgRemoved: data.bg_removed_url,
+          subtitled: data.subtitled_url,
+          subtitleFile: data.subtitle_file_url,
+          zipUrl: data.zip_url,
+        });
+      } else {
+        alert(`서버 오류: ${response.status}`);
+      }
     } catch (error) {
       alert('업로드 실패. 다시 시도해주세요.');
       console.error(error);
+    } finally {
       setIsProcessing(false);
     }
   };
