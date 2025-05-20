@@ -40,6 +40,7 @@ const Home: React.FC = () => {
         method: 'POST',
         body: formData,
         mode: 'cors',
+        credentials: 'include',
       });
 
       if (response.ok) {
